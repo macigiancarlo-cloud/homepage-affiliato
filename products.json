@@ -1,38 +1,47 @@
 [
   {
-    "title": "Skechers Loving – Sneakers donna",
     "asin": "B0DW9H5LWZ",
-    "bullets": [
-      "Comode per camminare ogni giorno",
-      "Stile casual, facile da abbinare",
-      "Vedi taglie e colori disponibili su Amazon"
-    ]
-  },
-  {
-    "title": "Maglia senza maniche da donna",
-    "asin": "B0D1VK6MK8",
-    "bullets": [
-      "Leggera e comoda per l’estate",
-      "Facile da abbinare a jeans o leggings",
-      "Controlla taglie e colori su Amazon"
-    ]
-  },
-  {
-    "title": "Body/lingerie da donna (ALL SHE)",
-    "asin": "B0F42MXGL7",
-    "bullets": [
-      "Design femminile, adatto a diverse occasioni",
-      "Vestibilità comoda (verifica guida taglie su Amazon)",
-      "Vedi colori e varianti disponibili su Amazon"
-    ]
-  },
-  {
-    "title": "Prodotto Amazon (ASIN B06ZZP99NJ)",
-    "asin": "B06ZZP99NJ",
+    "title": "Prodotto Amazon (ASIN B0DW9H5LWZ)",
     "bullets": [
       "Dettagli e varianti su Amazon",
       "Controlla taglie/colori disponibili",
-      "Prezzo e disponibilità sul sito Amazon"
+      "Prezzo e disponibilità aggiornati su Amazon"
+    ]
+  },
+  {
+    "asin": "B0D1VK6MK8",
+    "title": "Prodotto Amazon (ASIN B0D1VK6MK8)",
+    "bullets": [
+      "Dettagli e varianti su Amazon",
+      "Controlla taglie/colori disponibili",
+      "Prezzo e disponibilità aggiornati su Amazon"
+    ]
+  },
+  {
+    "asin": "B0F42MXGL7",
+    "title": "Prodotto Amazon (ASIN B0F42MXGL7)",
+    "bullets": [
+      "Dettagli e varianti su Amazon",
+      "Controlla taglie/colori disponibili",
+      "Prezzo e disponibilità aggiornati su Amazon"
+    ]
+  },
+  {
+    "asin": "B06ZZP99NJ",
+    "title": "Prodotto Amazon (ASIN B06ZZP99NJ)",
+    "bullets": [
+      "Dettagli e varianti su Amazon",
+      "Controlla taglie/colori disponibili",
+      "Prezzo e disponibilità aggiornati su Amazon"
+    ]
+  },
+  {
+    "asin": "B07G85PQ5J",
+    "title": "Prodotto Amazon (ASIN B07G85PQ5J)",
+    "bullets": [
+      "Dettagli e varianti su Amazon",
+      "Controlla taglie/colori disponibili",
+      "Prezzo e disponibilità aggiornati su Amazon"
     ]
   }
 ]
