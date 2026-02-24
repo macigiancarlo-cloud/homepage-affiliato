@@ -1,4 +1,4 @@
-const AFF_TAG = "goitab-21";
+const AFF_TAG = "tuttowowshop-21";
 
 function amazonLink(asin) {
   return `https://www.amazon.it/dp/${encodeURIComponent(asin)}?tag=${encodeURIComponent(AFF_TAG)}`;
