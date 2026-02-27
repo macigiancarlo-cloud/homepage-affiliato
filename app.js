@@ -1,3 +1,4 @@
+
 const AFF_TAG = "tuttowowshop-21";
 
 function amazonLink(asin) {
@@ -14,9 +15,10 @@ function escapeHtml(s) {
 }
 
 async function loadProducts() {
-  // Percorso assoluto: funziona bene su Vercel e su dominio
+  // IMPORTANTISSIMO: path assoluto per Vercel + no cache
   const res = await fetch("/products.json", { cache: "no-store" });
-  if (!res.ok) throw new Error("Impossibile leggere products.json");
+  if (!res.ok) throw new Error(`Impossibile leggere /products.json (HTTP ${res.status})`);
+
   const data = await res.json();
   if (!Array.isArray(data)) throw new Error("products.json deve essere un array");
   return data;
@@ -25,13 +27,9 @@ async function loadProducts() {
 function render(products, query = "") {
   const grid = document.getElementById("grid");
   const empty = document.getElementById("empty");
-  const loading = document.getElementById("loading");
 
-  if (!grid || !empty || !loading) {
-    // Se manca un ID, meglio fermarsi con un errore chiaro
-    console.error("ID mancanti in index.html (grid/empty/loading).");
-    return;
-  }
+  if (!grid) throw new Error('Manca <div id="grid"> in index.html');
+  if (!empty) throw new Error('Manca <div id="empty"> in index.html');
 
   const q = query.trim().toLowerCase();
 
@@ -43,18 +41,6 @@ function render(products, query = "") {
         return title.includes(q) || asin.includes(q) || bullets.includes(q);
       })
     : products;
-
-  // Stop loading
-  loading.classList.add("hidden");
-
-  if (filtered.length === 0) {
-    grid.innerHTML = "";
-    empty.textContent = "Nessun prodotto trovato.";
-    empty.classList.remove("hidden");
-    return;
-  }
-
-  empty.classList.add("hidden");
 
   grid.innerHTML = filtered
     .map((p) => {
@@ -75,26 +61,42 @@ function render(products, query = "") {
       `;
     })
     .join("");
+
+  // Usa la classe che ESISTE nel tuo CSS: .hidden
+  empty.classList.toggle("hidden", filtered.length !== 0);
 }
 
-(async function main() {
-  const empty = document.getElementById("empty");
+async function main() {
   const loading = document.getElementById("loading");
+  const empty = document.getElementById("empty");
+  const input = document.getElementById("q");
 
   try {
-    const products = await loadProducts();
-    render(products);
+    if (loading) loading.classList.remove("hidden");
 
-    const input = document.getElementById("q");
+    const products = await loadProducts();
+
+    if (loading) loading.classList.add("hidden");
+
+    render(products, "");
+
     if (input) {
       input.addEventListener("input", () => render(products, input.value));
     }
   } catch (err) {
     console.error(err);
+
     if (loading) loading.classList.add("hidden");
+
+    // Mostra errore in pagina (così lo vedi anche senza Console)
     if (empty) {
-      empty.textContent = `Errore caricamento prodotti: ${err.message}`;
       empty.classList.remove("hidden");
+      empty.innerHTML = `
+        <strong>Errore caricamento prodotti</strong><br>
+        ${escapeHtml(err.message || String(err))}
+      `;
     }
   }
-})();
+}
+
+main();
