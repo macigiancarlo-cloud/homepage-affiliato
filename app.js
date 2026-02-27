@@ -14,7 +14,7 @@ function escapeHtml(s) {
 }
 
 async function loadProducts() {
-  const res = await fetch("products.json", { cache: "no-store" });
+  const res = await fetch("/products.json", { cache: "no-store" })
   if (!res.ok) throw new Error("Impossibile leggere products.json");
   const data = await res.json();
   if (!Array.isArray(data)) throw new Error("products.json deve essere un array");
