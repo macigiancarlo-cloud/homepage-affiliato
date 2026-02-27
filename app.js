@@ -1,4 +1,3 @@
-// app.js
 const AFF_TAG = "tuttowowshop-21";
 
 function amazonLink(asin) {
@@ -15,28 +14,12 @@ function escapeHtml(s) {
 }
 
 async function loadProducts() {
-  // IMPORTANTE: path assoluto per funzionare su Vercel, dominio custom e preview
+  // Percorso assoluto: funziona bene su Vercel e su dominio
   const res = await fetch("/products.json", { cache: "no-store" });
-
-  if (!res.ok) {
-    throw new Error(`Impossibile leggere /products.json (HTTP ${res.status})`);
-  }
-
+  if (!res.ok) throw new Error("Impossibile leggere products.json");
   const data = await res.json();
-
-  if (!Array.isArray(data)) {
-    throw new Error("products.json deve essere un array");
-  }
-
+  if (!Array.isArray(data)) throw new Error("products.json deve essere un array");
   return data;
-}
-
-function normalizeProducts(data) {
-  return data.map((p) => ({
-    asin: (p && p.asin ? String(p.asin) : "").trim(),
-    title: (p && p.title ? String(p.title) : "Prodotto").trim(),
-    bullets: Array.isArray(p && p.bullets) ? p.bullets.map((b) => String(b)) : [],
-  })).filter((p) => p.asin.length > 0);
 }
 
 function render(products, query = "") {
@@ -44,21 +27,34 @@ function render(products, query = "") {
   const empty = document.getElementById("empty");
   const loading = document.getElementById("loading");
 
-  if (!grid) return;
-
-  // Nasconde il banner "Caricamento..." appena stiamo per renderizzare
-  if (loading) loading.style.display = "none";
+  if (!grid || !empty || !loading) {
+    // Se manca un ID, meglio fermarsi con un errore chiaro
+    console.error("ID mancanti in index.html (grid/empty/loading).");
+    return;
+  }
 
   const q = query.trim().toLowerCase();
 
   const filtered = q
     ? products.filter((p) => {
-        const t = (p.title || "").toLowerCase();
-        const a = (p.asin || "").toLowerCase();
-        const b = (p.bullets || []).join(" ").toLowerCase();
-        return t.includes(q) || a.includes(q) || b.includes(q);
+        const title = (p.title || "").toLowerCase();
+        const asin = (p.asin || "").toLowerCase();
+        const bullets = Array.isArray(p.bullets) ? p.bullets.join(" ").toLowerCase() : "";
+        return title.includes(q) || asin.includes(q) || bullets.includes(q);
       })
     : products;
+
+  // Stop loading
+  loading.classList.add("hidden");
+
+  if (filtered.length === 0) {
+    grid.innerHTML = "";
+    empty.textContent = "Nessun prodotto trovato.";
+    empty.classList.remove("hidden");
+    return;
+  }
+
+  empty.classList.add("hidden");
 
   grid.innerHTML = filtered
     .map((p) => {
@@ -68,58 +64,37 @@ function render(products, query = "") {
       const bulletsHtml = bullets.map((b) => `<li>${escapeHtml(b)}</li>`).join("");
 
       return `
-<article class="card">
-  <h3>${title}</h3>
-  <ul>${bulletsHtml}</ul>
-  <a class="btn" href="${amazonLink(asin)}" target="_blank" rel="sponsored noopener">
-    Vedi su Amazon
-  </a>
-  <div class="meta">ASIN: ${asin}</div>
-</article>
-      `.trim();
+        <article class="card">
+          <h3>${title}</h3>
+          <ul>${bulletsHtml}</ul>
+          <a class="btn" href="${amazonLink(asin)}" target="_blank" rel="sponsored noopener">
+            Vedi su Amazon
+          </a>
+          <div class="meta">ASIN: ${asin}</div>
+        </article>
+      `;
     })
     .join("");
-
-  if (empty) {
-    empty.classList.toggle("hidden", filtered.length !== 0);
-  }
 }
 
 (async function main() {
-  const loading = document.getElementById("loading");
   const empty = document.getElementById("empty");
-  const input = document.getElementById("q");
+  const loading = document.getElementById("loading");
 
   try {
-    if (loading) loading.style.display = "block";
-    if (empty) empty.classList.add("hidden");
-
-    const raw = await loadProducts();
-    const products = normalizeProducts(raw);
-
+    const products = await loadProducts();
     render(products);
 
+    const input = document.getElementById("q");
     if (input) {
       input.addEventListener("input", () => render(products, input.value));
     }
   } catch (err) {
-    // Se fallisce il fetch, mostriamo un messaggio utile
-    const grid = document.getElementById("grid");
-    if (loading) loading.style.display = "none";
-    if (empty) empty.classList.remove("hidden");
-
-    if (grid) {
-      grid.innerHTML = `
-        <article class="card">
-          <h3>Errore caricamento prodotti</h3>
-          <p style="opacity:.9; line-height:1.4">
-            ${escapeHtml(err && err.message ? err.message : String(err))}
-          </p>
-          <p style="opacity:.7">
-            Verifica che <code>/products.json</code> esista e sia pubblicato.
-          </p>
-        </article>
-      `;
+    console.error(err);
+    if (loading) loading.classList.add("hidden");
+    if (empty) {
+      empty.textContent = `Errore caricamento prodotti: ${err.message}`;
+      empty.classList.remove("hidden");
     }
   }
 })();
