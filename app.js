@@ -1,8 +1,15 @@
-
 const AFF_TAG = "tuttowowshop-21";
 
 function amazonLink(asin) {
   return `https://www.amazon.it/dp/${encodeURIComponent(asin)}?tag=${encodeURIComponent(AFF_TAG)}`;
+}
+
+// Immagine prodotto basata su ASIN (widget Amazon Ads).
+// Non richiede PA-API e funziona bene su siti statici.
+function amazonImage(asin) {
+  const a = encodeURIComponent(asin);
+  const tag = encodeURIComponent(AFF_TAG);
+  return `https://ws-eu.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=${a}&Format=_SL160_&ID=AsinImage&MarketPlace=IT&ServiceVersion=20070822&WS=1&tag=${tag}`;
 }
 
 function escapeHtml(s) {
@@ -44,19 +51,33 @@ function render(products, query = "") {
 
   grid.innerHTML = filtered
     .map((p) => {
+      const rawAsin = (p.asin || "").trim();
       const title = escapeHtml(p.title || "Prodotto");
-      const asin = escapeHtml(p.asin || "");
+      const asinSafe = escapeHtml(rawAsin);
+
       const bullets = Array.isArray(p.bullets) ? p.bullets.slice(0, 3) : [];
       const bulletsHtml = bullets.map((b) => `<li>${escapeHtml(b)}</li>`).join("");
 
       return `
         <article class="card">
-          <h3>${title}</h3>
+          <div class="card-head">
+            <img
+              class="card-img"
+              src="${amazonImage(rawAsin)}"
+              alt="${title}"
+              loading="lazy"
+              decoding="async"
+            />
+            <h3>${title}</h3>
+          </div>
+
           <ul>${bulletsHtml}</ul>
-          <a class="btn" href="${amazonLink(asin)}" target="_blank" rel="sponsored noopener">
+
+          <a class="btn" href="${amazonLink(rawAsin)}" target="_blank" rel="sponsored noopener">
             Vedi su Amazon
           </a>
-          <div class="meta">ASIN: ${asin}</div>
+
+          <div class="meta">ASIN: ${asinSafe}</div>
         </article>
       `;
     })

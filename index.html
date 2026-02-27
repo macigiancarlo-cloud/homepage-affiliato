@@ -1,80 +1,89 @@
 <!doctype html>
 <html lang="it">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Consigliati su Amazon</title>
-  <meta name="description" content="Selezione di prodotti consigliati. Clicca per vedere prezzo e disponibilità su Amazon." />
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-  <header class="top">
-    <div class="container row">
-      <div class="brand">La mia selezione</div>
-      <nav class="nav">
-        <a href="#prodotti">Prodotti</a>
-        <a href="#faq">FAQ</a>
-      </nav>
-    </div>
-  </header>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Consigliati su Amazon</title>
+    <meta
+      name="description"
+      content="Selezione di prodotti consigliati. Clicca per vedere prezzo e disponibilità su Amazon."
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
 
-  <main>
-    <section class="hero">
+  <body>
+    <header class="top">
       <div class="container">
+        <div class="row">
+          <div class="brand">La mia selezione</div>
+
+          <nav class="nav" aria-label="Navigazione">
+            <a href="#prodotti">Prodotti</a>
+            <a href="#faq">FAQ</a>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="hero">
         <h1>Prodotti consigliati (senza prezzi qui)</h1>
-        <p class="lead">
-          Prezzo e disponibilità li vedi su Amazon al momento del click.
-        </p>
+        <p class="lead">Prezzo e disponibilità li vedi su Amazon nel momento del click.</p>
 
         <div class="disclosure" role="note">
           In qualità di Affiliato Amazon io ricevo un guadagno dagli acquisti idonei.
         </div>
-      </div>
-    </section>
+      </section>
 
-    <section id="prodotti" class="section">
-      <div class="container">
+      <section id="prodotti" class="section">
         <div class="section-head">
           <h2>Prodotti</h2>
+
           <div class="controls">
-            <input id="q" type="search" placeholder="Cerca..." aria-label="Cerca prodotti" />
+            <input
+              id="q"
+              type="search"
+              placeholder="Cerca..."
+              autocomplete="off"
+              aria-label="Cerca prodotti"
+            />
           </div>
         </div>
 
-        <div id="grid" class="grid" aria-live="polite"></div>
+        <div id="loading" class="card" style="margin-bottom:16px; opacity:.85;">
+          Caricamento prodotti…
+        </div>
 
-        <div id="empty" class="empty hidden">
+        <div id="empty" class="card hidden" style="margin-bottom:16px;">
           Nessun prodotto trovato.
         </div>
-      </div>
-    </section>
 
-    <section id="faq" class="section">
-      <div class="container">
+        <div id="grid" class="grid" aria-live="polite"></div>
+      </section>
+
+      <section id="faq" class="section">
         <h2>FAQ</h2>
 
         <details class="faq">
-          <summary>Perché non vedo i prezzi?</summary>
-          <p>Per verificare prezzo e disponibilità aggiornati, clicca “Vedi su Amazon”.</p>
+          <summary>Da dove arrivano prezzi e disponibilità?</summary>
+          <p>Prezzo e disponibilità sono sempre quelli mostrati su Amazon al momento del click.</p>
         </details>
 
         <details class="faq">
-          <summary>I link sono affiliati?</summary>
-          <p>Sì: alcuni link sono link affiliati. Se acquisti tramite quei link potrei ricevere una commissione senza costi aggiuntivi per te.</p>
+          <summary>Perché non mostri i prezzi qui?</summary>
+          <p>Per evitare informazioni non aggiornate: il prezzo varia spesso e fa fede Amazon.</p>
         </details>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container">
+        <div>
+          <a href="privacy.html">Privacy</a> · <a href="contatti.html">Contatti</a>
+        </div>
       </div>
-    </section>
-  </main>
+    </footer>
 
-  <footer class="footer">
-    <div class="container foot">
-      <p><a href="privacy.html">Privacy</a> · <a href="contatti.html">Contatti</a></p>
-      <small>© <span id="y"></span> — Pagina affiliata</small>
-    </div>
-  </footer>
-
-  <script src="app.js"></script>
-  <script>document.getElementById("y").textContent = new Date().getFullYear();</script>
-</body>
-
+    <script src="app.js"></script>
+  </body>
 </html>
