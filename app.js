@@ -1,17 +1,3 @@
-const AFF_TAG = "tuttowowshop-21";
-
-function amazonLink(asin) {
-  return `https://www.amazon.it/dp/${encodeURIComponent(asin)}?tag=${encodeURIComponent(AFF_TAG)}`;
-}
-
-// Immagine prodotto basata su ASIN (widget Amazon Ads).
-// Non richiede PA-API e funziona bene su siti statici.
-function amazonImage(asin) {
-  const a = encodeURIComponent(asin);
-  const tag = encodeURIComponent(AFF_TAG);
-  return `https://ws-eu.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=${a}&Format=_SL160_&ID=AsinImage&MarketPlace=IT&ServiceVersion=20070822&WS=1&tag=${tag}`;
-}
-
 function escapeHtml(s) {
   return String(s)
     .replaceAll("&", "&amp;")
@@ -22,10 +8,8 @@ function escapeHtml(s) {
 }
 
 async function loadProducts() {
-  // IMPORTANTISSIMO: path assoluto per Vercel + no cache
   const res = await fetch("/products.json", { cache: "no-store" });
   if (!res.ok) throw new Error(`Impossibile leggere /products.json (HTTP ${res.status})`);
-
   const data = await res.json();
   if (!Array.isArray(data)) throw new Error("products.json deve essere un array");
   return data;
@@ -34,12 +18,11 @@ async function loadProducts() {
 function render(products, query = "") {
   const grid = document.getElementById("grid");
   const empty = document.getElementById("empty");
+  const loading = document.getElementById("loading");
 
-  if (!grid) throw new Error('Manca <div id="grid"> in index.html');
-  if (!empty) throw new Error('Manca <div id="empty"> in index.html');
+  if (loading) loading.classList.add("hidden");
 
   const q = query.trim().toLowerCase();
-
   const filtered = q
     ? products.filter((p) => {
         const title = (p.title || "").toLowerCase();
@@ -52,28 +35,30 @@ function render(products, query = "") {
   grid.innerHTML = filtered
     .map((p) => {
       const rawAsin = (p.asin || "").trim();
-      const title = escapeHtml(p.title || "Prodotto");
+      const title = escapeHtml(p.title || `Prodotto Amazon (ASIN ${rawAsin})`);
       const asinSafe = escapeHtml(rawAsin);
+
+      const amazonUrl = (p.amazonUrl || "").trim();
+      const safeAmazonUrl = escapeHtml(amazonUrl);
 
       const bullets = Array.isArray(p.bullets) ? p.bullets.slice(0, 3) : [];
       const bulletsHtml = bullets.map((b) => `<li>${escapeHtml(b)}</li>`).join("");
 
+      const imgUrl = (p.imageUrl || "").trim();
+      const imgTag = imgUrl
+        ? `<img class="card-img" src="${escapeHtml(imgUrl)}" alt="${title}" loading="lazy" decoding="async" referrerpolicy="no-referrer" />`
+        : `<div class="card-img" aria-hidden="true"></div>`;
+
       return `
         <article class="card">
           <div class="card-head">
-            <img
-              class="card-img"
-              src="${amazonImage(rawAsin)}"
-              alt="${title}"
-              loading="lazy"
-              decoding="async"
-            />
+            ${imgTag}
             <h3>${title}</h3>
           </div>
 
           <ul>${bulletsHtml}</ul>
 
-          <a class="btn" href="${amazonLink(rawAsin)}" target="_blank" rel="sponsored noopener">
+          <a class="btn" href="${safeAmazonUrl}" target="_blank" rel="sponsored noopener">
             Vedi su Amazon
           </a>
 
@@ -83,39 +68,25 @@ function render(products, query = "") {
     })
     .join("");
 
-  // Usa la classe che ESISTE nel tuo CSS: .hidden
   empty.classList.toggle("hidden", filtered.length !== 0);
 }
 
 async function main() {
-  const loading = document.getElementById("loading");
-  const empty = document.getElementById("empty");
   const input = document.getElementById("q");
+  const loading = document.getElementById("loading");
 
   try {
     if (loading) loading.classList.remove("hidden");
-
     const products = await loadProducts();
-
-    if (loading) loading.classList.add("hidden");
-
     render(products, "");
-
-    if (input) {
-      input.addEventListener("input", () => render(products, input.value));
-    }
+    if (input) input.addEventListener("input", () => render(products, input.value));
   } catch (err) {
     console.error(err);
-
+    const empty = document.getElementById("empty");
     if (loading) loading.classList.add("hidden");
-
-    // Mostra errore in pagina (così lo vedi anche senza Console)
     if (empty) {
       empty.classList.remove("hidden");
-      empty.innerHTML = `
-        <strong>Errore caricamento prodotti</strong><br>
-        ${escapeHtml(err.message || String(err))}
-      `;
+      empty.innerHTML = `<strong>Errore caricamento prodotti</strong><br>${escapeHtml(err.message || String(err))}`;
     }
   }
 }
