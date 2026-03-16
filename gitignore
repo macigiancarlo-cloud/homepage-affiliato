@@ -1,0 +1,30 @@
+
+# === File di lavoro locali (non versionare) ===
+links.txt
+link.txt
+links_backup.txt
+
+# === Script/utility locali (se presenti) ===
+*.log
+*.tmp
+
+# === Python ===
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+.env
+
+# === Node / build (se usi tool in futuro) ===
+node_modules/
+dist/
+build/
+
+# === OS / Editor ===
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/links.txt

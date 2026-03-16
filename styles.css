@@ -1,0 +1,293 @@
+:root {
+  --bg: #0b0f14;
+  --panel: #0f1722;
+  --text: #e8eef6;
+  --muted: #8a96a8;
+  --line: #1e2d42;
+  --accent: #f0a500;
+  --accent2: #e05c2a;
+  --radius: 16px;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.55;
+}
+
+a { color: inherit; text-decoration: none; }
+
+/* ── HEADER ── */
+.container { max-width: 1160px; margin: 0 auto; padding: 0 20px; }
+
+.top {
+  position: sticky; top: 0; z-index: 10;
+  background: rgba(11,15,20,.85);
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(12px);
+}
+.row {
+  display: flex; align-items: center;
+  justify-content: space-between; padding: 16px 0;
+}
+.brand {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800; font-size: 18px;
+  letter-spacing: -.3px;
+}
+.nav { display: flex; gap: 20px; color: var(--muted); font-size: 14px; }
+.nav a:hover { color: var(--text); }
+
+/* ── HERO ── */
+.hero { padding: 52px 0 20px; }
+
+h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(32px, 5vw, 54px);
+  line-height: 1.08;
+  margin: 0 0 12px;
+  font-weight: 800;
+}
+.accent {
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.lead { color: var(--muted); max-width: 60ch; margin: 0 0 16px; font-size: 16px; }
+.disclosure {
+  display: inline-block;
+  background: rgba(240,165,0,.08);
+  border: 1px solid rgba(240,165,0,.2);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* ── SEZIONE ── */
+.section { padding: 32px 0; }
+.section-head {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  gap: 12px; flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+h2 {
+  font-family: 'Syne', sans-serif;
+  margin: 0; font-size: 24px; font-weight: 700;
+}
+
+/* ── BADGE CONTATORE ── */
+.count-badge {
+  display: inline-block;
+  background: rgba(240,165,0,.15);
+  border: 1px solid rgba(240,165,0,.3);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 99px;
+  vertical-align: middle;
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* ── SEARCH ── */
+.controls input {
+  width: min(320px, 80vw);
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: rgba(15,23,34,.7);
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+}
+.controls input:focus { outline: 2px solid rgba(240,165,0,.35); }
+
+/* ── FILTRI CATEGORIA ── */
+.filtri {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.filtro {
+  padding: 7px 16px;
+  border-radius: 99px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .18s;
+}
+.filtro:hover {
+  border-color: rgba(240,165,0,.4);
+  color: var(--text);
+}
+.filtro.active {
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  border-color: transparent;
+  color: #0b0f14;
+  font-weight: 700;
+}
+
+/* ── STATO (loading/empty) ── */
+.stato-card {
+  background: rgba(15,23,34,.6);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+  color: var(--muted);
+}
+
+/* ── GRID ── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 4px;
+}
+
+/* Tablet: 2 colonne */
+@media (max-width: 900px) {
+  .grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Mobile: 1 colonna */
+@media (max-width: 560px) {
+  .grid { grid-template-columns: 1fr; }
+  h1 { font-size: 30px; }
+}
+
+/* ── CARD ── */
+.card {
+  background: rgba(15,23,34,.75);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: border-color .2s, transform .2s;
+}
+.card:hover {
+  border-color: rgba(240,165,0,.3);
+  transform: translateY(-2px);
+}
+
+/* Immagine grande in cima */
+.card-img-wrap {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: rgba(11,15,20,.5);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 16px;
+}
+.card-img-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--line);
+  font-size: 40px;
+}
+
+.card-body {
+  padding: 14px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.card-cat {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+
+.card h3 {
+  margin: 0 0 10px;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--text);
+}
+
+.card ul {
+  margin: 0 0 14px;
+  padding-left: 16px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.card li { margin: 4px 0; }
+
+/* ── BOTTONE ── */
+.btn {
+  margin-top: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: rgba(240,165,0,.08);
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 13px;
+  font-family: inherit;
+  transition: background .18s, border-color .18s;
+}
+.btn:hover {
+  background: rgba(240,165,0,.18);
+  border-color: rgba(240,165,0,.5);
+}
+.btn-disabled {
+  opacity: .4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.meta { color: var(--muted); font-size: 11px; margin-top: 8px; }
+
+/* ── FAQ ── */
+.faq {
+  background: rgba(15,23,34,.72);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin: 10px 0;
+}
+.faq summary { cursor: pointer; font-weight: 600; }
+.faq p { color: var(--muted); margin: 10px 0 0; font-size: 14px; }
+
+/* ── FOOTER ── */
+.footer {
+  border-top: 1px solid var(--line);
+  padding: 24px 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.hidden { display: none !important; }
