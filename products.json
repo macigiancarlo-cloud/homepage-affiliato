@@ -57,7 +57,7 @@
       "Controlla taglie/colori disponibili",
       "Prezzo e disponibilità aggiornati su Amazon"
     ],
-    "categoria": "Cucina"
+    "categoria": "Casa"
   },
   {
     "asin": "B0BTMBP897",
@@ -93,7 +93,7 @@
       "Controlla accessori/varianti disponibili",
       "Prezzo e disponibilità aggiornati su Amazon"
     ],
-    "categoria": "Elettronica"
+    "categoria": "Abbigliamento"
   },
   {
     "asin": "B0DFX3N9ZF",
@@ -117,7 +117,7 @@
       "Controlla accessori/varianti disponibili",
       "Prezzo e disponibilità aggiornati su Amazon"
     ],
-    "categoria": "Cucina"
+    "categoria": "Giardino"
   },
   {
     "asin": "B0DV978KDS",
@@ -165,7 +165,7 @@
       "Controlla accessori/varianti disponibili",
       "Prezzo e disponibilità aggiornati su Amazon"
     ],
-    "categoria": "Cucina"
+    "categoria": "Abbigliamento"
   },
   {
     "asin": "B0FC5P9L64",
@@ -225,7 +225,7 @@
       "Controlla accessori/varianti disponibili",
       "Prezzo e disponibilità aggiornati su Amazon"
     ],
-    "categoria": "Elettronica"
+    "categoria": "Bambini"
   },
   {
     "asin": "B0CCYPKJHL",
@@ -249,7 +249,7 @@
       "Velocità aria regolabile fino a 210 km/h",
       "Include batteria 2,0Ah e caricabatteria"
     ],
-    "categoria": "Elettronica"
+    "categoria": "Giardino"
   },
   {
     "asin": "B08WJJCKCQ",
@@ -322,5 +322,17 @@
       "Prezzo e disponibilità aggiornati su Amazon"
     ],
     "categoria": "Bambini"
+  },
+  {
+    "asin": "B0CFKP27HT",
+    "title": "Onsoyours Stivali da Donna Boots Gothic Chunky Anfibi Scarpe con Zip Tacco Medio Punta Tonda Moda Stivaletti alla Caviglia con Lacci Autunno Inverno Primavera",
+    "amazonUrl": "https://www.amazon.it/dp/B0CFKP27HT?tag=tuttowowshop-21",
+    "imageUrl": "https://m.media-amazon.com/images/I/511xNsjS4SL._AC_SY575_.jpg",
+    "bullets": [
+      "Dettagli e varianti su Amazon",
+      "Controlla accessori/varianti disponibili",
+      "Prezzo e disponibilità aggiornati su Amazon"
+    ],
+    "categoria": "Abbigliamento"
   }
 ]
