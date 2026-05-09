@@ -7,8 +7,7 @@ echo   PUBBLICA PRODOTTI - Sito Amazon
 echo ========================================
 echo.
 
-REM Passo 1: Importa links.txt nel JSON
-echo [1/4] Importo i prodotti da links.txt...
+echo [1/3] Importo i prodotti da links.txt...
 python importa_da_links.py
 if %errorlevel% neq 0 (
     echo ERRORE durante l'importazione!
@@ -16,37 +15,23 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-REM Passo 2: Valida il JSON
 echo.
-echo [2/4] Verifico che il JSON sia corretto...
-python -m json.tool products.json > NUL
-if %errorlevel% neq 0 (
-    echo ERRORE: products.json non valido!
-    pause
-    exit /b 1
-)
-echo OK - JSON valido.
-
-REM Passo 3: Commit
-echo.
-echo [3/4] Salvo su GitHub...
+echo [2/3] Salvo le modifiche...
 git add products.json
 git commit -m "Aggiorna prodotti"
 if %errorlevel% neq 0 (
-    echo Nessuna modifica da pubblicare oppure errore git.
+    echo Nessuna modifica da pubblicare.
     pause
     exit /b 1
 )
 
-REM Passo 4: Push
 echo.
-echo [4/4] Pubblico online (Vercel)...
-git push
-if %errorlevel% neq 0 (
-    echo ERRORE durante il push!
-    pause
-    exit /b 1
-)
+echo [3/3] Pubblico online...
+git push origin principale
+
+echo.
+echo [4/4] Avvio deploy su Vercel...
+curl -X POST "https://api.vercel.com/v1/integrations/deploy/prj_22VOV9qaqZd3q5R29Og9AnQ1zUOJ/CWvlm6whgd"
 
 echo.
 echo ========================================

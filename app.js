@@ -1,6 +1,6 @@
-// app.js — versione migliorata con categorie, filtri, immagini grandi
+// app.js (robusto: accetta products.json con chiavi inglesi o italiane)
 
-const ASSOCIATE_TAG = "tuttowowshop-21";
+const ASSOCIATE_TAG = "tuttowowshop-21"; // <-- il tuo tag affiliato
 
 function escapeHtml(s) {
   return String(s)
@@ -11,24 +11,49 @@ function escapeHtml(s) {
     .replaceAll("'", "&#039;");
 }
 
+// Normalizza un prodotto: supporta sia chiavi "inglesi" che "italiane"
 function normalizeProduct(p) {
-  const asin = (p?.asin ?? "").toString().trim();
-  const title = (p?.title ?? p?.titolo ?? "").toString().trim();
-  const imageUrl = (p?.imageUrl ?? p?.["URL immagine"] ?? "").toString().trim();
-  const categoria = (p?.categoria ?? "Altro").toString().trim();
-  const bulletsRaw = p?.bullets ?? [];
+  const asin = (p?.asin ?? p?.["asinò"] ?? p?.["asin"] ?? "").toString().trim();
+
+  const title = (p?.title ?? p?.titolo ?? p?.["titolo"] ?? "").toString().trim();
+
+  const imageUrl = (
+    p?.imageUrl ??
+    p?.["URL immagine"] ??
+    p?.["url immagine"] ??
+    p?.["URL_immagine"] ??
+    ""
+  ).toString().trim();
+
+  const bulletsRaw = p?.bullets ?? p?.proiettili ?? p?.["proiettili"] ?? [];
   const bullets = Array.isArray(bulletsRaw)
-    ? bulletsRaw.map(x => String(x)).filter(Boolean)
+    ? bulletsRaw.map((x) => String(x)).filter(Boolean)
     : [];
-  const amazonUrlRaw = (p?.amazonUrl ?? "").toString().trim();
+
+  const amazonUrlRaw = (p?.amazonUrl ?? p?.["amazonUrl"] ?? "").toString().trim();
   const amazonUrl = buildAmazonUrl(amazonUrlRaw, asin);
-  return { asin, title, imageUrl, bullets, amazonUrl, categoria };
+
+  return { asin, title, imageUrl, bullets, amazonUrl };
 }
 
-function buildAmazonUrl(raw, asin) {
+// Costruisce un URL Amazon valido.
+// Priorità:
+// 1) se amazonUrlRaw è già un http(s) URL -> usa quello
+// 2) altrimenti se c'è ASIN -> costruisci https://www.amazon.it/dp/<ASIN>?tag=<TAG>
+// 3) fallback -> Amazon homepage
+function buildAmazonUrl(amazonUrlRaw, asin) {
+  const raw = (amazonUrlRaw || "").trim();
+
+  // già URL completo
   if (/^https?:\/\//i.test(raw)) return raw;
-  if (asin && /^[A-Z0-9]{10}$/i.test(asin))
-    return `https://www.amazon.it/dp/${encodeURIComponent(asin)}?tag=${encodeURIComponent(ASSOCIATE_TAG)}`;
+
+  // se qualcuno ha messo solo "tag=..." o roba simile, ignoralo e costruisci da ASIN
+  if (asin && /^[A-Z0-9]{10}$/i.test(asin)) {
+    return `https://www.amazon.it/dp/${encodeURIComponent(asin)}?tag=${encodeURIComponent(
+      ASSOCIATE_TAG
+    )}`;
+  }
+
   return "https://www.amazon.it/";
 }
 
@@ -40,92 +65,74 @@ async function loadProducts() {
   return data.map(normalizeProduct);
 }
 
-function buildFiltri(products) {
-  const wrap = document.getElementById("filtri");
-  if (!wrap) return;
-
-  // Raccogli categorie uniche
-  const cats = [...new Set(products.map(p => p.categoria))].sort();
-
-  cats.forEach(cat => {
-    const btn = document.createElement("button");
-    btn.className = "filtro";
-    btn.dataset.cat = cat;
-    btn.textContent = cat;
-    wrap.appendChild(btn);
-  });
-}
-
-function render(products, query, catAttiva) {
+function render(products, query = "") {
   const grid = document.getElementById("grid");
   const empty = document.getElementById("empty");
   const loading = document.getElementById("loading");
-  const badge = document.getElementById("count-badge");
 
   if (!grid) return;
   if (loading) loading.classList.add("hidden");
 
-  const q = (query || "").trim().toLowerCase();
-  const cat = catAttiva || "tutti";
+  const q = query.trim().toLowerCase();
 
-  let filtered = products;
+  const filtered = q
+    ? products.filter((p) => {
+        const title = (p.title || "").toLowerCase();
+        const asin = (p.asin || "").toLowerCase();
+        const bullets = Array.isArray(p.bullets) ? p.bullets.join(" ").toLowerCase() : "";
+        return title.includes(q) || asin.includes(q) || bullets.includes(q);
+      })
+    : products;
 
-  // Filtro categoria
-  if (cat !== "tutti") {
-    filtered = filtered.filter(p => p.categoria === cat);
-  }
+  grid.innerHTML = filtered
+    .map((p) => {
+      const rawAsin = (p.asin || "").trim();
 
-  // Filtro ricerca testo
-  if (q) {
-    filtered = filtered.filter(p => {
-      const t = (p.title || "").toLowerCase();
-      const a = (p.asin || "").toLowerCase();
-      const b = Array.isArray(p.bullets) ? p.bullets.join(" ").toLowerCase() : "";
-      return t.includes(q) || a.includes(q) || b.includes(q);
-    });
-  }
+      const titleText = (p.title || "").trim();
+      const title = escapeHtml(
+        titleText || (rawAsin ? `Prodotto Amazon (ASIN ${rawAsin})` : "Prodotto Amazon")
+      );
 
-  // Badge contatore
-  if (badge) {
-    badge.textContent = `${filtered.length} prodotti`;
-    badge.classList.remove("hidden");
-  }
+      const asinSafe = escapeHtml(rawAsin);
 
-  grid.innerHTML = filtered.map(p => {
-    const rawAsin = (p.asin || "").trim();
-    const titleText = (p.title || "").trim();
-    const title = escapeHtml(titleText || (rawAsin ? `Prodotto Amazon (${rawAsin})` : "Prodotto Amazon"));
-    const asinSafe = escapeHtml(rawAsin);
-    const bullets = Array.isArray(p.bullets) ? p.bullets.slice(0, 3) : [];
-    const bulletsHtml = bullets.map(b => `<li>${escapeHtml(b)}</li>`).join("");
+      // bullets (max 3)
+      const bullets = Array.isArray(p.bullets) ? p.bullets.slice(0, 3) : [];
+      const bulletsHtml = bullets.map((b) => `<li>${escapeHtml(b)}</li>`).join("");
 
-    const imgUrl = (p.imageUrl || "").trim();
-    const imgHtml = imgUrl
-      ? `<img class="card-img" src="${escapeHtml(imgUrl)}" alt="${title}" loading="lazy" decoding="async" referrerpolicy="no-referrer" />`
-      : `<div class="card-img-placeholder">📦</div>`;
+      // immagine
+      const imgUrl = (p.imageUrl || "").trim();
+      const imgTag = imgUrl
+        ? `<img class="card-img" src="${escapeHtml(imgUrl)}" alt="${title}" loading="lazy" decoding="async" referrerpolicy="no-referrer" />`
+        : `<div class="card-img" aria-hidden="true"></div>`;
 
-    const amazonUrl = (p.amazonUrl || "").trim();
-    const hasValidAsin = /^[A-Z0-9]{10}$/i.test(rawAsin);
-    const isFallbackHome = amazonUrl === "https://www.amazon.it/";
-    const disableBtn = !hasValidAsin && isFallbackHome;
+      // link Amazon: se asin non valido e amazonUrl è fallback, disabilita bottone
+      const amazonUrl = (p.amazonUrl || "").trim();
+      const hasValidAsin = /^[A-Z0-9]{10}$/i.test(rawAsin);
+      const isFallbackHome = amazonUrl === "https://www.amazon.it/";
+      const disableBtn = !hasValidAsin && isFallbackHome;
 
-    const btnHtml = disableBtn
-      ? `<span class="btn btn-disabled" aria-disabled="true">Link non disponibile</span>`
-      : `<a class="btn" href="${escapeHtml(amazonUrl)}" target="_blank" rel="sponsored noopener">Vedi su Amazon →</a>`;
+      const btnHtml = disableBtn
+        ? `<span class="btn btn-disabled" aria-disabled="true" title="ASIN mancante o non valido">Link non disponibile</span>`
+        : `<a class="btn" href="${escapeHtml(amazonUrl)}" target="_blank" rel="sponsored noopener">
+             Vedi su Amazon
+           </a>`;
 
-    return `
-      <article class="card">
-        <div class="card-img-wrap">${imgHtml}</div>
-        <div class="card-body">
-          <div class="card-cat">${escapeHtml(p.categoria || "Altro")}</div>
-          <h3>${title}</h3>
+      return `
+        <article class="card">
+          <div class="card-head">
+            ${imgTag}
+            <h3>${title}</h3>
+          </div>
+
           <ul>${bulletsHtml}</ul>
+
           ${btnHtml}
-          <div class="meta">ASIN: ${asinSafe || "—"}</div>
-        </div>
-      </article>
-    `;
-  }).join("");
+
+          <div class="meta">ASIN: ${asinSafe || "-"}</div>
+        </article>
+      `;
+    })
+    .join("");
 
   if (empty) empty.classList.toggle("hidden", filtered.length !== 0);
 }
@@ -134,40 +141,20 @@ async function main() {
   const input = document.getElementById("q");
   const loading = document.getElementById("loading");
 
-  let catAttiva = "tutti";
-
   try {
     if (loading) loading.classList.remove("hidden");
     const products = await loadProducts();
-
-    buildFiltri(products);
-    render(products, "", catAttiva);
-
-    // Ricerca testo
-    if (input) {
-      input.addEventListener("input", () => render(products, input.value, catAttiva));
-    }
-
-    // Filtri categoria
-    const filtriWrap = document.getElementById("filtri");
-    if (filtriWrap) {
-      filtriWrap.addEventListener("click", e => {
-        const btn = e.target.closest(".filtro");
-        if (!btn) return;
-        catAttiva = btn.dataset.cat;
-        filtriWrap.querySelectorAll(".filtro").forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        render(products, input ? input.value : "", catAttiva);
-      });
-    }
-
+    render(products, "");
+    if (input) input.addEventListener("input", () => render(products, input.value));
   } catch (err) {
     console.error(err);
     const empty = document.getElementById("empty");
     if (loading) loading.classList.add("hidden");
     if (empty) {
       empty.classList.remove("hidden");
-      empty.innerHTML = `<strong>Errore caricamento prodotti</strong><br>${escapeHtml(err?.message || String(err))}`;
+      empty.innerHTML = `<strong>Errore caricamento prodotti</strong><br>${escapeHtml(
+        err?.message || String(err)
+      )}`;
     }
   }
 }
