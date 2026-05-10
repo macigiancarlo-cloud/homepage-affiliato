@@ -48,7 +48,27 @@ async function loadProducts() {
   return data.map(normalizeProduct);
 }
 
-function render(products, query = "") {
+function renderFilters(products, activeCategory, onSelect) {
+  const container = document.getElementById("filtri");
+  if (!container) return;
+
+  // Raccoglie categorie uniche ordinate
+  const cats = ["Tutti", ...Array.from(
+    new Set(products.map(p => p.categoria).filter(Boolean))
+  ).sort()];
+
+  container.innerHTML = cats.map(cat => {
+    const active = cat === activeCategory ? " filtro-attivo" : "";
+    return `<button class="filtro${active}" data-cat="${escapeHtml(cat)}">${escapeHtml(cat)}</button>`;
+  }).join("");
+
+  // Event listener sui bottoni
+  container.querySelectorAll(".filtro").forEach(btn => {
+    btn.addEventListener("click", () => onSelect(btn.dataset.cat));
+  });
+}
+
+function render(products, query = "", activeCategory = "Tutti") {
   const grid = document.getElementById("grid");
   const empty = document.getElementById("empty");
   const loading = document.getElementById("loading");
@@ -57,15 +77,20 @@ function render(products, query = "") {
   if (loading) loading.classList.add("hidden");
 
   const q = query.trim().toLowerCase();
-  const filtered = q
-    ? products.filter((p) => {
-        const title = (p.title || "").toLowerCase();
-        const asin = (p.asin || "").toLowerCase();
-        const cat = (p.categoria || "").toLowerCase();
-        const bullets = Array.isArray(p.bullets) ? p.bullets.join(" ").toLowerCase() : "";
-        return title.includes(q) || asin.includes(q) || cat.includes(q) || bullets.includes(q);
-      })
+
+  let filtered = activeCategory && activeCategory !== "Tutti"
+    ? products.filter(p => p.categoria === activeCategory)
     : products;
+
+  if (q) {
+    filtered = filtered.filter((p) => {
+      const title = (p.title || "").toLowerCase();
+      const asin = (p.asin || "").toLowerCase();
+      const cat = (p.categoria || "").toLowerCase();
+      const bullets = Array.isArray(p.bullets) ? p.bullets.join(" ").toLowerCase() : "";
+      return title.includes(q) || asin.includes(q) || cat.includes(q) || bullets.includes(q);
+    });
+  }
 
   grid.innerHTML = filtered
     .map((p) => {
@@ -77,17 +102,14 @@ function render(products, query = "") {
       const asinSafe = escapeHtml(rawAsin);
       const categoria = escapeHtml((p.categoria || "").trim());
 
-      // bullets (max 3)
       const bullets = Array.isArray(p.bullets) ? p.bullets.slice(0, 3) : [];
       const bulletsHtml = bullets.map((b) => `<li>${escapeHtml(b)}</li>`).join("");
 
-      // immagine grande in cima
       const imgUrl = (p.imageUrl || "").trim();
       const imgHtml = imgUrl
         ? `<img src="${escapeHtml(imgUrl)}" alt="${title}" loading="lazy" decoding="async" referrerpolicy="no-referrer" />`
         : "";
 
-      // bottone Amazon
       const amazonUrl = (p.amazonUrl || "").trim();
       const hasValidAsin = /^[A-Z0-9]{10}$/i.test(rawAsin);
       const isFallbackHome = amazonUrl === "https://www.amazon.it/";
@@ -96,7 +118,6 @@ function render(products, query = "") {
         ? `<span class="btn btn-disabled" aria-disabled="true">Link non disponibile</span>`
         : `<a class="btn" href="${escapeHtml(amazonUrl)}" target="_blank" rel="sponsored noopener">Vedi su Amazon</a>`;
 
-      // badge categoria
       const catHtml = categoria
         ? `<span class="card-cat">${categoria}</span>`
         : "";
@@ -122,11 +143,24 @@ function render(products, query = "") {
 async function main() {
   const input = document.getElementById("q");
   const loading = document.getElementById("loading");
+  let activeCategory = "Tutti";
+
   try {
     if (loading) loading.classList.remove("hidden");
     const products = await loadProducts();
-    render(products, "");
-    if (input) input.addEventListener("input", () => render(products, input.value));
+
+    const onCategorySelect = (cat) => {
+      activeCategory = cat;
+      renderFilters(products, activeCategory, onCategorySelect);
+      render(products, input ? input.value : "", activeCategory);
+    };
+
+    renderFilters(products, activeCategory, onCategorySelect);
+    render(products, "", activeCategory);
+
+    if (input) {
+      input.addEventListener("input", () => render(products, input.value, activeCategory));
+    }
   } catch (err) {
     console.error(err);
     const empty = document.getElementById("empty");

@@ -153,3 +153,31 @@ h2{margin:0 0 10px;font-size:26px}
 @media (max-width: 600px){
   .grid{grid-template-columns: 1fr}
 }
+
+/* === FILTRI CATEGORIA === */
+.filtri{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0 4px;
+}
+.filtro{
+  padding: 7px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(35,48,71,.9);
+  background: rgba(15,23,34,.55);
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color .15s, color .15s;
+}
+.filtro:hover{
+  border-color: rgba(168,179,196,.55);
+  color: var(--text);
+}
+.filtro.filtro-attivo{
+  border-color: var(--text);
+  color: var(--text);
+  background: rgba(35,48,71,.5);
+}
