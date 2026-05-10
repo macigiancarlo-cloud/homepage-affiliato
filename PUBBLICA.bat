@@ -1,42 +1,35 @@
 @echo off
-cd /d "%~dp0"
-
-echo.
+chcp 65001 >nul
 echo ========================================
 echo   PUBBLICA PRODOTTI - Sito Amazon
 echo ========================================
-echo.
+
+cd /d "%~dp0"
 
 echo [1/3] Importo i prodotti da links.txt...
 python importa_da_links.py
-if %errorlevel% neq 0 (
-    echo ERRORE durante l'importazione!
+if errorlevel 1 (
+    echo ERRORE durante l'importazione.
     pause
     exit /b 1
 )
 
-echo.
 echo [2/3] Salvo le modifiche...
-git add products.json
-git commit -m "Aggiorna prodotti"
-if %errorlevel% neq 0 (
+git add -A
+git diff --cached --quiet && (
     echo Nessuna modifica da pubblicare.
+) || (
+    git commit -m "Aggiorna prodotti"
+)
+
+echo [3/3] Pubblico su Vercel...
+git push origin main
+if errorlevel 1 (
+    echo ERRORE durante il push.
     pause
     exit /b 1
 )
 
 echo.
-echo [3/3] Pubblico online...
-git push origin principale
-
-echo.
-echo [4/4] Avvio deploy su Vercel...
-curl -X POST "https://api.vercel.com/v1/integrations/deploy/prj_22VOV9qaqZd3q5R29Og9AnQ1zUOJ/CWvlm6whgd"
-
-echo.
-echo ========================================
-echo   FATTO! Sito aggiornato con successo.
-echo   Fai Ctrl+F5 sul browser per vedere.
-echo ========================================
-echo.
+echo FATTO! Sito aggiornato con successo.
 pause
