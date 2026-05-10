@@ -4,9 +4,6 @@ Come funziona
 I prodotti sono gestiti tramite `links.txt` e generati automaticamente in `products.json` dallo script Python. Il sito è ospitato su Vercel e si aggiorna automaticamente ad ogni push su `main`.
 Aggiungere prodotti
 Apri `links.txt` e aggiungi una riga nel formato:
-```
-   Titolo Prodotto | URL Amazon (con tag affiliato) | URL Immagine | Categoria
-   ```
 Fai doppio click su `PUBBLICA.bat`
 Il sito si aggiorna automaticamente
 Categorie disponibili
