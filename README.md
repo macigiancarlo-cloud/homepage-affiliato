@@ -9,9 +9,11 @@ I prodotti sono gestiti tramite `links.txt` e generati automaticamente in `produ
 ## Aggiungere prodotti
 
 1. Apri `links.txt` e aggiungi una riga nel formato:
-   ```
+
+```
    Titolo Prodotto | URL Amazon (con tag affiliato) | URL Immagine | Categoria
    ```
+
 2. Fai doppio click su `PUBBLICA.bat`
 3. Il sito si aggiorna automaticamente
 
@@ -21,11 +23,12 @@ Abbigliamento, Bambini, Casa, Cucina, Elettronica, Giardino
 
 ## Tecnologie
 
-- HTML, CSS, JavaScript vanilla
-- Python (script importazione prodotti)
-- GitHub + Vercel (deploy automatico)
-- Amazon Associates (affiliazione)
+* HTML, CSS, JavaScript vanilla
+* Python (script importazione prodotti)
+* GitHub + Vercel (deploy automatico)
+* Amazon Associates (affiliazione)
 
 ## Nota legale
 
 In qualità di Affiliato Amazon ricevo un guadagno dagli acquisti idonei.
+
